@@ -1,138 +1,177 @@
-# **Giglyte: Your Next Gig Platform! 🚀**
+# Giglyte: Modern Freelance Marketplace 🤝
 
-Giglyte is a robust web application designed to connect clients with freelancers, making it incredibly straightforward to find and post jobs. Built on the powerful Laravel 12 framework and featuring a snappy frontend powered by Vite and Tailwind CSS, this platform offers a seamless experience for managing user accounts and job listings. It’s engineered for efficiency and scalability, providing a solid foundation for any modern gig economy application.
+Giglyte is a dynamic and intuitive freelance marketplace platform designed to connect clients with talented freelancers seamlessly. This project provides a robust backend API built with Laravel, paired with a modern frontend workflow powered by Vite and Tailwind CSS. It empowers users to register, manage their profiles, post jobs, apply for opportunities, and efficiently track applications. Whether you're a client seeking expertise or a freelancer looking for your next gig, Giglyte aims to streamline the process.
 
-## **Usage**
+## Usage
 
-Getting Giglyte up and running, and then interacting with its features, is quite straightforward!
+Getting Giglyte up and running is straightforward. Follow these steps to set up the development environment and explore its features.
 
-### **1. Initial Setup**
+### Prerequisites
 
-First, ensure you have PHP, Composer, Node.js, and npm installed on your machine.
+Before you begin, ensure you have the following installed on your system:
 
-1.  **Clone the repository**:
+*   **PHP 8.2+**: The core language for the Laravel backend.
+*   **Composer**: PHP dependency manager.
+*   **Node.js (LTS recommended)**: Required for Vite and frontend tooling.
+*   **npm or Yarn**: JavaScript package manager.
+*   **SQLite**: The default database used in this setup (no external server needed for local development).
+
+### Setup and Local Development
+
+1.  **Clone the repository:**
+
     ```bash
-    git clone <your-repo-url>
-    cd giglyte-project-directory
+    git clone [your-repo-link]
+    cd giglyte # or whatever your project directory is named
     ```
-2.  **Install PHP dependencies**:
+
+2.  **Install PHP Dependencies:**
+
     ```bash
     composer install
     ```
-3.  **Install Node.js dependencies**:
+
+3.  **Install Node.js Dependencies:**
+
     ```bash
     npm install
+    # or yarn install
     ```
-4.  **Copy the environment file**:
+
+4.  **Configure Environment Variables:**
+
+    Copy the example environment file and generate an application key:
+
     ```bash
     cp .env.example .env
-    ```
-5.  **Generate application key**:
-    ```bash
     php artisan key:generate
     ```
-6.  **Set up the database**:
-    By default, Giglyte uses SQLite for local development. Ensure the `database/database.sqlite` file exists. If not, create it:
-    ```bash
-    touch database/database.sqlite
-    ```
-    Then, run migrations to create the necessary tables:
+
+    Ensure your `.env` file uses `DB_CONNECTION=sqlite` and `DB_DATABASE=giglyte` (or another path to your SQLite file, e.g., `database/database.sqlite`). The `giglyte` file provided seems to be a pre-populated SQLite database, but it's good practice to ensure migrations are run.
+
+5.  **Run Database Migrations:**
+
+    This will set up the necessary tables for users, jobs, and applications.
+
     ```bash
     php artisan migrate
     ```
-7.  **Start the development servers**:
-    This command will concurrently run the Laravel development server, queue listener, logs, and Vite for frontend compilation.
+
+    *(Optional: If you want to seed the database with dummy data, you would run `php artisan db:seed` here, assuming seeders are implemented.)*
+
+6.  **Link Storage (for public assets like profile images):**
+
+    ```bash
+    php artisan storage:link
+    ```
+
+7.  **Start the Development Servers:**
+
+    Open two separate terminal windows.
+
+    **Terminal 1 (Laravel Development Server):**
+
+    ```bash
+    php artisan serve
+    ```
+
+    This will typically run on `http://127.0.0.1:8000`.
+
+    **Terminal 2 (Vite Development Server):**
+
     ```bash
     npm run dev
+    # or yarn dev
     ```
-    You should now be able to access the application at `http://localhost:8000` (or similar, as indicated by the `php artisan serve` output).
 
-### **2. User Workflow (API & Views)**
+    This compiles and serves your frontend assets with hot module reloading.
 
-Giglyte provides both API endpoints and simple web views for basic user interactions.
+Now, your application should be accessible via `http://127.0.0.1:8000`. You can interact with the API or browse the Blade views directly.
 
-#### **Registration**
-*   **Web View**: Navigate to `http://localhost:8000/user/register` in your browser. Fill out the email and password fields and submit the form.
-*   **API Endpoint**: Send a `POST` request to `http://localhost:8000/user/create` with `email` and `password` in the request body.
+### API Endpoints
 
-#### **Email Verification**
-*   **Web View**: After registration, you'll need to verify your email. Go to `http://localhost:8000/user/verify`. Enter your registered email and the verification code sent to you (this code is currently stored in the `verification_code` column of the `users` table for local testing, as email sending isn't fully configured).
-*   **API Endpoint**: Send a `POST` request to `http://localhost:8000/user/verify` with `email` and `code` in the request body.
+Giglyte exposes a set of API endpoints for user and job management. Here are some key examples:
 
-#### **Login**
-*   **Web View**: Access the login form at `http://localhost:8000/user/login`. Provide your verified email and password.
-*   **API Endpoint**: Send a `POST` request to `http://localhost:8000/user/login` with `email` and `password`. On successful login, the API will return a `token` which is essential for authenticated actions like creating jobs.
+*   **User Registration**
+    *   `POST /user/create`
+    *   Payload: `{ email: "user@example.com", password: "yourpassword" }`
+*   **Email Verification**
+    *   `POST /user/verify`
+    *   Payload: `{ email: "user@example.com", code: "1234" }`
+*   **Complete User Profile**
+    *   `POST /user/final`
+    *   Payload: `{ email: "user@example.com", username: "john.doe", first_name: "John", last_name: "Doe", country: "USA", skills: "PHP, Laravel", bio: "Experienced developer", type: "freelancer" }`
+*   **User Login**
+    *   `POST /user/login`
+    *   Payload: `{ email: "user@example.com", password: "yourpassword" }`
+    *   Response includes a `token` for subsequent authenticated requests.
+*   **Update User Profile (Authenticated)**
+    *   `POST /user/update`
+    *   Headers: `Authorization: Bearer [YOUR_AUTH_TOKEN]`
+    *   Payload: `{ first_name: "New Name", username: "new_username" }`
+*   **Get All Jobs**
+    *   `GET /jobs/all`
+*   **Create a New Job (Authenticated - Client User Type)**
+    *   `POST /jobs/create`
+    *   Headers: `Authorization: Bearer [YOUR_AUTH_TOKEN]` (where token belongs to a client user)
+    *   Payload: `{ title: "Web Developer Needed", slug: "web-developer-needed", delivery_time: "2 weeks", status: "active", description: "Build a cool website.", tags: "web,php,js", price: 1500 }`
+*   **Apply for a Job**
+    *   `POST /apply`
+    *   Payload: `{ job_id: 1, freelancer_id: 2, cover_letter: "I am perfect for this job!" }`
+*   **View Job Applications for a Specific Job**
+    *   `GET /job/{job_id}/applications`
+*   **Update Job Application Status**
+    *   `PUT /application/{id}/status`
+    *   Payload: `{ status: "accepted" }` or `{ status: "rejected" }`
 
-#### **Finalizing User Profile (Optional)**
-*   **Web View**: After successful email verification, you can finalize your profile details at `http://localhost:8000/user/final`.
-*   **API Endpoint**: Send a `POST` request to `http://localhost:8000/user/final` with your `email` and additional user data (`first_name`, `last_name`, `username`, `country`, `skills`, `profile_image`, `bio`, `type`). This endpoint also ensures the email is verified first.
+### Frontend Views
 
-### **3. Job Management**
+The project also includes a few basic Blade views (`resources/views/`) for user interaction:
 
-#### **Creating a Job**
-Creating a job requires a valid authentication token obtained from the user login.
-*   **Web View**: Visit `http://localhost:8000/jobs/create`. This page includes a jQuery script that hardcodes a `Bearer` token for demonstration. **Note**: For a production-ready application, this token should be dynamically retrieved and securely managed after user login.
-*   **API Endpoint**: Send a `POST` request to `http://localhost:8000/jobs/create`.
-    *   **Headers**: `Authorization: Bearer <Your_Auth_Token>` (the token received from the `/user/login` endpoint).
-    *   **Body (JSON)**:
-        ```json
-        {
-            "title": "Your Job Title",
-            "delivery_time": "3 days",
-            "status": "active",
-            "description": "A detailed description of the job.",
-            "tags": "web-development, laravel, vuejs",
-            "price": 500
-        }
-        ```
-    The `client_id` for the job is automatically associated with the user whose token is provided.
+*   `/user/register`: Registration form.
+*   `/user/verify`: Email verification form.
+*   `/user/login`: Login form.
+*   `/user/final`: Form to complete user profile details.
+*   `/jobs/create`: Form for clients to create new job listings.
+*   `/user/edit`: Form to update an existing user's profile.
 
-#### **Viewing All Jobs**
-*   **API Endpoint**: Send a `GET` request to `http://localhost:8000/jobs/all` to retrieve a list of all available jobs.
+## Features
 
-## **Features**
+*   **Comprehensive User Management**: Seamless registration, secure login, email verification, and dynamic profile updates.
+*   **Robust Job Posting System**: Clients can create detailed job listings, including title, description, delivery time, tags, and price.
+*   **Efficient Job Application Workflow**: Freelancers can easily apply to jobs with their cover letters, and clients can track and manage applications.
+*   **API-First Architecture**: Clean, well-structured API endpoints facilitate interaction with the backend, perfect for integration with various frontend applications.
+*   **Modern Development Stack**: Leverages Laravel 12, Vite, and Tailwind CSS for a streamlined and enjoyable development experience.
+*   **Secure Authentication**: Implements token-based authentication for API routes, ensuring secure interactions.
+*   **Email Notifications**: Integrated email service for critical actions like account verification.
 
-Giglyte comes packed with essential features to kickstart your gig platform:
+## Technologies Used
 
-*   **Secure User Authentication**: Robust system for user registration, login, and email verification, ensuring only legitimate users can access services.
-*   **Comprehensive Profile Management**: Users can create detailed profiles including personal information, skills, and a bio, enriching their presence on the platform.
-*   **Dynamic Job Creation**: Clients can easily post new job listings with essential details like title, description, delivery time, and pricing.
-*   **Slug Generation**: Automatically generates unique, SEO-friendly slugs for job listings, improving discoverability.
-*   **Token-Based API Security**: All sensitive API endpoints are protected using Bearer tokens, providing secure communication.
-*   **Modern Frontend Stack**: Utilizes Vite for blazing-fast development and Tailwind CSS for a highly customizable and responsive user interface.
-*   **SQLite Database**: Configured for simple and efficient local development with a lightweight SQLite database.
+| Technology         | Category           |
+| :----------------- | :----------------- |
+| **Laravel 12**     | PHP Web Framework  |
+| **PHP 8.2+**       | Backend Language   |
+| **Vite 6**         | Frontend Tooling   |
+| **Tailwind CSS 4** | CSS Framework      |
+| **JavaScript**     | Frontend Scripting |
+| **SQLite**         | Database           |
+| **Composer**       | PHP Package Manager|
+| **npm**            | JS Package Manager |
+| **Axios**          | HTTP Client        |
+| **jQuery**         | JS Library         |
 
-## **Technologies Used**
+## License
 
-| Technology       | Description                        | Link                                          |
-| :--------------- | :--------------------------------- | :-------------------------------------------- |
-| **Laravel**      | PHP Web Application Framework      | [https://laravel.com/](https://laravel.com/)  |
-| **Vite**         | Next Generation Frontend Tooling   | [https://vitejs.dev/](https://vitejs.dev/)    |
-| **Tailwind CSS** | Utility-First CSS Framework        | [https://tailwindcss.com/](https://tailwindcss.com/) |
-| **PHP**          | Server-Side Scripting Language     | [https://www.php.net/](https://www.php.net/)  |
-| **JavaScript**   | Frontend Scripting Language        | [https://developer.mozilla.org/en-US/docs/Web/JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript) |
-| **SQLite**       | Lightweight, File-Based Database   | [https://www.sqlite.org/](https://www.sqlite.org/) |
-| **Composer**     | PHP Dependency Management          | [https://getcomposer.org/](https://getcomposer.org/) |
-| **npm**          | JavaScript Package Manager         | [https://www.npmjs.com/](https://www.npmjs.com/) |
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
-## **License**
+## Author Info
 
-This project is open-sourced software licensed under the MIT license.
+Feel free to connect or learn more about my work!
 
-## **Author Info**
-
-I'm a passionate developer focused on building robust and scalable web applications. If you'd like to connect or see more of my work, feel free to reach out!
-
-*   LinkedIn: [@YourLinkedInProfile](https://www.linkedin.com/in/yourprofile)
-*   Twitter: [@YourTwitterHandle](https://twitter.com/yourhandle)
-*   Portfolio: [YourPortfolio.com](https://yourportfolio.com)
+*   **Portfolio**: [Your Portfolio Link Here]
+*   **LinkedIn**: [Your LinkedIn Profile]
+*   **Twitter**: [@YourTwitterHandle]
 
 ---
-
-![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
 
 [![Readme was generated by Dokugen](https://img.shields.io/badge/Readme%20was%20generated%20by-Dokugen-brightgreen)](https://www.npmjs.com/package/dokugen)
