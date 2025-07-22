@@ -10,13 +10,20 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('job_applications', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
+{
+    Schema::create('job_applications', function (Blueprint $table) {
+        $table->id();
+        $table->unsignedBigInteger('job_id');
+        $table->unsignedBigInteger('freelancer_id');
+        $table->text('cover_letter')->nullable();
+        $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
+        $table->timestamps();
 
+        // Foreign keys
+        $table->foreign('job_id')->references('id')->on('jobs')->onDelete('cascade');
+        $table->foreign('freelancer_id')->references('id')->on('users')->onDelete('cascade');
+    });
+}
     /**
      * Reverse the migrations.
      */
