@@ -14,16 +14,18 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id()->unique();
             $table->timestamps();
-$table->string('name')->nullable();
+$table->string('last_name')->nullable();
+$table->string('first_name')->nullable();
 $table->string('email')->unique();
 $table->string('username')->nullable();
 $table->boolean('email_verified')->default(0);
 $table->string('country')->nullable();
 $table->string('password');
+$table->string('token')->nullable();
 $table->string('profile_image')->nullable();
 $table->integer('verification_code')->nullable();
 $table->boolean('verified')->default(0);
-$table->enum('status', ['active', 'suspended', 'banned'])->default('banned');
+$table->enum('status', ['active', 'suspended', 'banned'])->default('active');
 $table->string('skills')->nullable();
 $table->string('bio')->nullable();
 $table->enum('type', ['client', 'freelancer', 'admin'])->default('client');

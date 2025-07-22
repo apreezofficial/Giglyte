@@ -7,4 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Jobs extends Model
 {
 use HasFactory;
+protected $fillable = [
+    'title',
+    'slug',
+    'delivery_time',
+    'status',
+    'description',
+    'tags',
+    'price',
+    'client_id',
+];
 }
