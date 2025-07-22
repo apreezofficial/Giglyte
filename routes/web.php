@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\JobsController;
 use App\Models\Jobs;
+use App\Http\Controllers\JobApplicationController;
 
 Route::get('/', function () {
     return 'Welcome to Giglyte!';
@@ -33,3 +34,6 @@ Route::prefix('jobs')->controller(JobsController::class)->group(function () {
     Route::get('create', fn () => view('create-job'));
     Route::get('new', fn () => view('new_job'));
 });
+Route::post('/apply', [JobApplicationController::class, 'apply']);
+Route::get('/job/{job_id}/applications', [JobApplicationController::class, 'jobApplications']);
+Route::put('/application/{id}/status', [JobApplicationController::class, 'updateStatus']);
